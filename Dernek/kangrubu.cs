@@ -74,7 +74,6 @@ namespace Dernek
             else 
             {
                 MessageBox.Show("Değer seçin");
-
             }
 
 
@@ -133,6 +132,11 @@ namespace Dernek
                 dataGridView1.DataSource = table;
                 baglan.Close();
             }
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

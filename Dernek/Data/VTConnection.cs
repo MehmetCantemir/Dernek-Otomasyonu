@@ -38,51 +38,24 @@ namespace Dernek.Data
                 MessageBox.Show("Bağlantı var");  
              
         }
-        /*
-        public string[] veriCek()
-        {
-            string query = "SELECT * FROM Kisi";
-            OleDbCommand veriCek = new OleDbCommand(query, baglan);
-            OleDbDataAdapter oleDbDataAdapter = new OleDbDataAdapter(veriCek);
-            
-            DataTable data = new DataTable();
-            oleDbDataAdapter.Fill(data);
-            int i = 0;
-
-            string[] names=new string[data.Columns.Count];
-            while (i<=data.Columns.Count)
-            {
-                names[i] = data.Rows[i]["Adi"].ToString();
-                //MessageBox.Show(names[i]);
-                //MessageBox.Show(data.Rows[i]["Adi"].ToString());
-                i++;
-            }
-            return names;
-            
-        }
-        */
+       
     }
 
-    public class Tarih
-    {
-        public int Kimlik { get; set; }
+  
+
+    public class Aidat {
+
+
         public int AidatID { get; set; }
-
-        public int Ay {  get; set; }
-
-        public int Yil {  get; set; }
-    
-    }
-
-    public class Aidat { 
-    
-        public int AidatId { get; set; }
-
+        public int TC { get; set; } //foreign key
         public int AidatMiktari { get; set; }
         public bool Odendimi { get; set; }
-        public int TC { get; set; }
+      
+        public string AidatAyi { get; set; }
 
-        Tarih Tarih { get; set; }
+        public Kisi Kisi { get; set; }
+       
+        
 
     }
     public class Kisi
@@ -96,7 +69,7 @@ namespace Dernek.Data
 
         public string Aktif { get; set; }
 
-        Aidat aidat { get; set; }
+        public ICollection<Aidat> aidat { get; } = new List<Aidat>();
 
 
     }

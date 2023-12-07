@@ -60,5 +60,10 @@ namespace Dernek
             MessageBox.Show("Veri başarıyla eklendi");
 
         }
+
+        private void uyeEkle_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

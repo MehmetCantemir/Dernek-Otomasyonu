@@ -15,61 +15,14 @@ namespace Dernek
     public partial class Form1 : Form
     {
 
-        VTConnection VTBaglantisi = new VTConnection();
+   
         public Form1()
         {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
-        {
-            /* VTBaglantisi.VTConnect();
-             VTBaglantisi.baglantiKontrol();
-             string[] KisiAdlari = new string[10];
-             KisiAdlari = VTBaglantisi.veriCek();
-             label1.Text = KisiAdlari[0];
-             label2.Text = KisiAdlari[1];
-             VTBaglantisi.veriCek();
-             VTBaglantisi.VTDisConnect();*/
-            
-            /*DataAccess access = new DataAccess();
-            int TC = 1;
-            Kisi kisi = access.KisiBilgileri(TC);
-            Aidat aidat = access.AidatBilgileri(TC);
-            
-
-            Eris accesss=new Eris();
-            int TC1 = 2;
-            Kisi kisi1 =accesss.KisiBilgileri(TC1);
-
-
-
-
-            if (kisi1 != null)
-            {
-                label3.Text = "TC Kimlik = " + kisi1.TCKimlik.ToString();
-                label4.Text = "Adı = " + kisi1.Adi;
-                label5.Text = "Soyadı = " + kisi1.Soyadi;
-                label6.Text = "Kan Grubu = " + kisi1.KanGrubu;
-                label7.Text = "Şehir = " + kisi1.Sehir;
-                label8.Text = "Aktif = " + kisi1.Aktif;
-
-            }
-
-            else
-            {
-                MessageBox.Show("Kullanıcı yok!!!");
-            }
-
-            /*if (aidat != null)
-            {
-                label9.Text = "Aidat Miktarı = " + aidat.AidatMiktari.ToString();
-            }
-            else
-            {
-                MessageBox.Show("Kullanıcı yok!!!");
-            }
-            */
+        { 
             
 
         }
@@ -95,6 +48,14 @@ namespace Dernek
         {
             kisibilgileriguncellestir veriguncelle = new kisibilgileriguncellestir();
             veriguncelle.Show();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            aidatGoster aidatGoster = new aidatGoster();
+            aidatGoster.Show();
+
+           
         }
     }
 
