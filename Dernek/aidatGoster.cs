@@ -1,4 +1,6 @@
 ﻿using Dernek.Data;
+
+using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,9 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout;
+using System.IO;
+using iTextSharp.text;
+
 
 
 
@@ -22,6 +24,10 @@ namespace Dernek
         public aidatGoster()
         {
             InitializeComponent();
+            dataGridView1.Columns.Add("TC", "TC");
+            dataGridView1.Columns.Add("Adi", "Adı");
+            dataGridView1.Columns.Add("Soyadi", "Soyadı");
+            dataGridView1.Columns.Add("ToplamBorc", "Toplam Borç");
         }
 
         OleDbConnection baglan = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\mehme\\Desktop\\Dernek\\Dernek\\Data\\DernekVT.accdb");
@@ -49,8 +55,6 @@ namespace Dernek
             OleDbCommand cmd1 = new OleDbCommand(query1, baglan);
             cmd1.Parameters.AddWithValue("@TC", TC);
 
-
-
             OleDbDataReader reader1 = cmd1.ExecuteReader();
             while (reader1.Read())
             {
@@ -64,60 +68,53 @@ namespace Dernek
                 int borc = 0;
                 int borc_adeti = 0;
 
-               
-               // aidat eğer ödenmediyse otomatik borç atama ve ödemediği borç miktarını belirleme
-               if (!aidat.Odendimi)
-               {
-                   borc += 200;
-                   borc_adeti++;
-               }
+                // aidat eğer ödenmediyse otomatik borç atama ve ödemediği borç miktarını belirleme
+                if (!aidat.Odendimi)
+                {
+                    borc += 200;
+                    borc_adeti++;
+                }
 
-                borcPdf(borc, borc_adeti,TC);
+                //aylara göre aidat ödemesi yapılıp yapılmadığını listbox'a yazdırma.
+                if (borc == 0)
+                {
+                    listBox1.Items.Add(ay);
+                    listBox1.Items.Add("Aidat ödemesi yapılmamıştır !");
 
+                }
+                else
+                {
 
-               //aylara göre aidat ödemesi yapılıp yapılmadığını listbox'a yazdırma.
-               if (borc == 0)
-               {
-                  listBox1.Items.Add(ay);
-                  listBox1.Items.Add("Aidat ödemesi yapılmamıştır !");
-
-               }
-               else
-               { 
-              
-                   listBox1.Items.Add(ay);
-                   listBox1.Items.Add("Aidat ödemesi yapılmıştır!");
-               }
+                    listBox1.Items.Add(ay);
+                    listBox1.Items.Add("Aidat ödemesi yapılmıştır!");
+                }
 
             }
             baglan.Close();
 
         }
 
-        public void borcPdf(int borcAdeti , int borcMiktari,int TCKimlik)
+        public void toplamborc()
         {
+     
+            string sql = "SELECT Kisi.TC , Kisi.Adi , Kisi.Soyadi,SUM(Aidat.Borc) AS ToplamBorc "+
+                "FROM Kisi"+" LEFT JOIN Aidat ON Kisi.TC = Aidat.TC "+" GROUP BY Kisi.TC , Kisi.Adi,Kisi.Soyadi";
+
             baglan.Open();
-            string adi;
-            string query = "SELECT Adi FROM Kisi WHERE TCKimlik=@TC";
-            OleDbCommand cmd = new OleDbCommand(query, baglan);
-            cmd.Parameters.AddWithValue("@TC", TCKimlik);
+            OleDbCommand command = new OleDbCommand(sql,baglan);
+            OleDbDataReader reader = command.ExecuteReader();
 
-            Kisi kisi2 = new Kisi();
-
-            OleDbDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            while (reader.Read())
             {
-                kisi2.Adi = reader["Adi"].ToString();
+               
+                int TC = Convert.ToInt32(reader["TC"]);
+                string adi = reader["Adi"].ToString();
+                string soyadi = reader["Soyadi"].ToString();
+                decimal toplamBorc = reader["ToplamBorc"] != DBNull.Value ? Convert.ToDecimal(reader["ToplamBorc"]) : 0;
+                dataGridView1.Rows.Add(TC, adi, soyadi, toplamBorc);
+
             }
-            string pdfDosyaYolu = "C:\\Users\\mehme\\Desktop\\PDF";
-            var writer = new PdfWriter(pdfDosyaYolu);
-            var pdf = new PdfDocument(writer);
-            var document= new Document(pdf);
-
-            string eklenecek_veri = kisi2.Adi + " Kişinin Borç adeti = " + borcAdeti.ToString() + " ve toplam borç miktarı = " + borcAdeti.ToString();
-
-            document.Add(new Paragraph().(eklenecek_veri));
-
+            baglan.Close();
         }
 
         public string ayiGetir(string gelenAy)
@@ -184,6 +181,83 @@ namespace Dernek
 
             return ay;
 
+        }
+
+        public void pdfYazdir()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.OverwritePrompt = false;
+            saveFileDialog.Title = "PDF Dosyaları";
+            saveFileDialog.DefaultExt = "pdf";
+            saveFileDialog.Filter = "PDF Dosyası (*.pdf) | *.pdf|Tüm Dosyalar(*.*) | *.*";
+            
+            if(saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                PdfPTable pdftable = new PdfPTable(dataGridView1.ColumnCount);
+                pdftable.DefaultCell.Padding = 3;
+                pdftable.WidthPercentage = 80;
+                pdftable.DefaultCell.BorderWidth = 1;
+
+
+
+                foreach (DataGridViewColumn column in dataGridView1.Columns)
+                {
+                    PdfPCell cell = new PdfPCell(new Phrase(column.HeaderText));
+                    cell.BackgroundColor = new iTextSharp.text.BaseColor(240, 240, 240); // hücre arka plan rengi
+                    pdftable.AddCell(cell);
+                }
+
+
+
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+
+                        if (cell.Value != null)
+                        {
+                            pdftable.AddCell(cell.Value.ToString());
+                        }
+                        else
+                        {
+                            pdftable.AddCell(""); // Null değer ise boş hücre ekleyebilirsiniz.
+                        }
+
+                    }
+                }
+
+
+                using (FileStream stream = new FileStream(saveFileDialog.FileName + ".pdf", FileMode.Create))
+                {
+                    
+                    Document pdfDoc = new Document(PageSize.A2, 10f, 10f, 10f, 0f);// sayfa boyutu.
+                    PdfWriter.GetInstance(pdfDoc, stream);
+                    pdfDoc.Open();
+                    pdfDoc.Add(pdftable);
+                    pdfDoc.Close();
+                    stream.Close();
+                }
+                MessageBox.Show("Veriler PDF Olarak kaydedilmiştir.");
+            }
+
+           
+        
+        }
+
+        public void eposta()
+        {
+
+        }
+
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            pdfYazdir();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            toplamborc();
         }
     }
 }
