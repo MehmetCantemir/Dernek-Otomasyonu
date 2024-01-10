@@ -67,7 +67,7 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(74, 233);
+            this.dataGridView1.Location = new System.Drawing.Point(47, 230);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
@@ -107,7 +107,7 @@
             this.Controls.Add(this.comboBox1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "kangrubu";
-            this.Text = "kangrubu";
+            this.Text = "Filtreye Göre Veri Gösterme";
             this.Load += new System.EventHandler(this.kangrubu_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
